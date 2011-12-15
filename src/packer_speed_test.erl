@@ -11,28 +11,24 @@ test(Size, Jobs) ->
     {Module, Type, Obj} = make_test_obj(Size),
 
     io:format("Warming up chaches (if any)...~n"),
-    {ok, Packed1} = thrift_packer:serialize({struct, {Module, Type}}, Obj),
+    {ok, Packed1} = thrift_packer:pack({struct, {Module, Type}}, Obj),
     {ok, Packed2} = packer:pack({struct, {Module, Type}}, Obj),
 
     {ok, Res1} = packer:unpack({struct, {Module, Type}}, Packed1),
-    {ok, Res1} = thrift_packer:deserialize({struct, {Module, Type}}, Packed2),
+    {ok, Res1} = thrift_packer:unpack({struct, {Module, Type}}, Packed2),
 
     io:format("===== native implementation =====~n"),
-    TotalTimeNative = measure_jobs(fun() -> pack_native({Module, Type, Obj}) end, Jobs),
-    io:format("Total pack time: ~p~n", [TotalTimeNative/1000/1000]),
+    PackTime1   = measure_jobs(fun() -> packer:pack({struct, {Module, Type}}, Obj) end, Jobs),
+    UnpackTime1 = measure_jobs(fun() -> packer:unpack({struct, {Module, Type}}, Packed1) end, Jobs),
+    io:format("Total pack time:   ~p seconds~n", [PackTime1/1000/1000]),
+    io:format("Total unpack time: ~p seconds~n", [UnpackTime1/1000/1000]),
 
     io:format("===== erlang implementation =====~n"),
-    TotalTimeErlang = measure_jobs(fun() -> pack_erlang({Module, Type, Obj}) end, Jobs),
-    io:format("Total pack time: ~p~n", [TotalTimeErlang/1000/1000]),
+    PackTime2   = measure_jobs(fun() -> thrift_packer:pack({struct, {Module, Type}}, Obj) end, Jobs),
+    UnpackTime2 = measure_jobs(fun() -> thrift_packer:unpack({struct, {Module, Type}}, Packed1) end, Jobs),
+    io:format("Total pack time:   ~p seconds~n", [PackTime2/1000/1000]),
+    io:format("Total unpack time: ~p seconds~n", [UnpackTime2/1000/1000]),
     io:format("=================================~n").
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-pack_native({Module, Type, Obj}) ->
-    packer:pack({struct, {Module, Type}}, Obj).
-
-pack_erlang({Module, Type, Obj}) ->
-    thrift_packer:serialize({struct, {Module, Type}}, Obj).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

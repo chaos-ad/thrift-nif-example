@@ -34,7 +34,7 @@ gen_books(N) ->
 gen_book(N) ->
     BookID = #bookID{id=N},
     AuthorID = #personID{id=N},
-    BookTitle = "Dostoevsky (" ++ integer_to_list(N) ++ ")",
+    BookTitle = "some_book_" ++ integer_to_list(N),
     BookContent = "Some very interesting book text here",
     Book = #book{id=BookID, author=AuthorID, title=BookTitle, content=BookContent},
     {BookID, Book}.
