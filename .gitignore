@@ -1,3 +1,5 @@
+.kdev4
+packer.kdev4
 ebin
 priv
 src/thrift
