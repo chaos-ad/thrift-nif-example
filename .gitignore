@@ -1,0 +1,8 @@
+ebin
+priv
+src/thrift
+c_str/*.o
+c_src/thrift
+include/thrift
+thrift/gen-*
+
